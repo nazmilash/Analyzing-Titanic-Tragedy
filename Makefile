@@ -1,11 +1,10 @@
 .PHONY: help deps render serve open clean
 
 R_LIB := $(HOME)/R/library
-PKGS := rmarkdown knitr dplyr ggplot2 stargazer
+PKGS := "rmarkdown","knitr","dplyr","ggplot2","stargazer"
 
 help:
-	@echo "Targets: deps render serve open clean"
-
+	@echo "Targets: deps render serve open clean"	
 deps:
 	sudo apt update
 	sudo apt install -y pandoc libcurl4-openssl-dev libssl-dev libxml2-dev build-essential || true
@@ -23,4 +22,3 @@ open:
 
 clean:
 	rm -f *.html titanic_temp.csv
-	

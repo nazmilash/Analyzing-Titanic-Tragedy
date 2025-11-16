@@ -24,6 +24,7 @@ This dataset includes Survival status, Passenger Class, Sex, Age, Siblings, Pare
 ```{r}
 download.file("https://stanford.io/2O9RUCF", destfile = "titanic_temp.csv", mode = "wb")
 titanic <- read.csv("titanic_temp.csv")
+head(titanic)
 ```
 
 ### Part 1: Data Exploration
@@ -31,28 +32,41 @@ titanic <- read.csv("titanic_temp.csv")
 ```{r}
 titanic <- titanic %>% 
   mutate(
-    survived = factor(Survived, levels= c(0,1), labels= c("No","Yes"))
-  ) %>%
-  mutate(Age_group = cut(Age, breaks = c(0,18,30,55,Inf),
-                         labels= c("Child (0-18)", "Young Adult (19-30)", "Adult (31-55)", "Elderly (56+)"),
-                         right = FALSE))
+    survived = factor(Survived, levels = c(0, 1), labels = c("No", "Yes")),
+    Age_group = cut(Age, breaks = c(0, 18, 30, 55, Inf),
+                    labels = c("Child (0-18)", "Young Adult (19-30)", "Adult (31-55)", "Elderly (56+)"),
+                    right = FALSE)
+  )
+
 # Overall survival
-ggplot(titanic, aes(x = survived, fill = survived)) + geom_bar() + labs(title="Overall Survival Count") + theme_minimal()
+ggplot(titanic, aes(x = survived, fill = survived)) + 
+  geom_bar() + 
+  labs(title = "Overall Survival Count", x = "Survived", y = "Count") + 
+  theme_minimal()
 ```
 
 ```{r}
 # By class
-ggplot(titanic, aes(x = factor(Pclass), fill = survived)) + geom_bar(position="fill") + labs(x="Pclass", y="Proportion") + theme_minimal()
+ggplot(titanic, aes(x = factor(Pclass), fill = survived)) + 
+  geom_bar(position = "fill") + 
+  labs(title = "Survival by Passenger Class", x = "Class", y = "Proportion") + 
+  theme_minimal()
 ```
 
 ```{r}
 # By sex
-ggplot(titanic, aes(x = Sex, fill = survived)) + geom_bar(position="fill") + theme_minimal()
+ggplot(titanic, aes(x = Sex, fill = survived)) + 
+  geom_bar(position = "fill") + 
+  labs(title = "Survival by Sex", x = "Sex", y = "Proportion") + 
+  theme_minimal()
 ```
 
 ```{r}
 # By age group
-ggplot(titanic, aes(x = Age_group, fill = survived)) + geom_bar(position="fill") + theme_minimal()
+ggplot(titanic, aes(x = Age_group, fill = survived)) + 
+  geom_bar(position = "fill") + 
+  labs(title = "Survival by Age Group", x = "Age Group", y = "Proportion") + 
+  theme_minimal()
 ```
 
 ### Part 2: Linear Probability Model
@@ -60,25 +74,19 @@ ggplot(titanic, aes(x = Age_group, fill = survived)) + geom_bar(position="fill")
 ```{r}
 model <- lm(Survived ~ Sex + factor(Pclass) + Age, data = titanic)
 summary(model)
-stargazer(model, type="text", title="LPM Results")
+stargazer(model, type = "text", title = "LPM Results")
 ```
 
 ### Part 3: Logit Model
 
 ```{r}
-model_1 <- glm(Survived ~ Sex + factor(Pclass) + Age, data= titanic, family = binomial)
+model_1 <- glm(Survived ~ Sex + factor(Pclass) + Age, data = titanic, family = binomial)
 summary(model_1)
-stargazer(model_1, type="text", title="Logit Results")
+stargazer(model_1, type = "text", title = "Logit Results")
 odds_ratios <- exp(coef(model_1))
 data.frame(Variable = names(odds_ratios), Odds_Ratio = as.numeric(odds_ratios))
 ```
 
 ### Part 4: Policy Analysis
 
-Based on both models, the key determinants of survival were, in order of strength: Sex and Passenger Class.
-
-The results implies an idea of social inequality in 1912:
-
-The disaster protocol was supposed to be "women and children first," but our models show it was heavily influenced by "money first." The wealthy (1st Class) were located closer to the lifeboats and had better access, giving them a huge advantage. 
-
-The steep drop in survival odds for 3rd Class passengers proves that where you stood in the social hierarchy directly impacted your opportunity to live or die. The tragedy was not just a disaster of nature, but a disaster of structural inequality.
+The analysis reveals clear patterns in Titanic survival rates driven by social class, gender, and age — reflecting the tragic inequalities of the era.
